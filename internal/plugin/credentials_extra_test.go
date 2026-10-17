@@ -117,7 +117,7 @@ func TestCredentialImportedDuplicateAndInspectionFailures(t *testing.T) {
 			}}
 			m := NewManager(NewHostBridge(f.call))
 			m.cfg.BaseURL = config.DefaultBaseURL
-			resp := postCredential(t, m, `{"base_url":"https://opencode.ai/zen/go/v1","api_key":"imported-dummy"}`)
+			resp := postCredential(t, m, `{"base_url":"https://opencode.ai/inference/go/v1","api_key":"imported-dummy"}`)
 			if resp.StatusCode != tt.status || len(f.callsOf(pluginabi.MethodHostAuthSave)) != 0 {
 				t.Fatalf("status=%d", resp.StatusCode)
 			}

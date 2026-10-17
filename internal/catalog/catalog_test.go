@@ -40,7 +40,7 @@ func (f *fakeClient) set(resp pluginapi.HTTPResponse, err error) {
 
 func testCfg() config.Config {
 	return config.Config{
-		CatalogURL:       "https://opencode.ai/zen/go/v1/models",
+		CatalogURL:       "https://opencode.ai/inference/go/v1/models",
 		ModelPrefix:      config.ModelPrefix{Enabled: true, Value: "opencode-go"},
 		MaxResponseBytes: 1 << 20,
 		Catalog:          config.Catalog{StaleWhileUnavailable: true},
@@ -95,7 +95,7 @@ func TestRefreshRequestShape(t *testing.T) {
 	if req.Method != "GET" {
 		t.Errorf("Method = %q, want GET", req.Method)
 	}
-	if req.URL != "https://opencode.ai/zen/go/v1/models" {
+	if req.URL != "https://opencode.ai/inference/go/v1/models" {
 		t.Errorf("URL = %q", req.URL)
 	}
 	if got := req.Headers.Get("Authorization"); got != "Bearer "+testKey {
@@ -750,7 +750,7 @@ func TestJoinUpstreamURL(t *testing.T) {
 	cases := []struct{ base, endpoint string }{
 		{"https://opencode.ai", "/v1/chat/completions"},
 		{"https://opencode.ai/", "/v1/messages"},
-		{"https://opencode.ai/zen/go/v1", "/v1/responses"},
+		{"https://opencode.ai/inference/go/v1", "/v1/responses"},
 		{"https://opencode.ai", "v1@evil.com"},
 		{"https://opencode.ai", "/custom"},
 		{"https://opencode.ai/", ""},
@@ -774,9 +774,9 @@ func TestEndpointEscapesBase(t *testing.T) {
 	}{
 		{"https://opencode.ai", "/v1@evil.com/x", true},
 		{"https://opencode.ai", "@evil.com/", true},
-		{"https://opencode.ai/zen/go/v1", "/v1@evil.com/x", false}, // @ lands in path
+		{"https://opencode.ai/inference/go/v1", "/v1@evil.com/x", false}, // @ lands in path
 		{"https://opencode.ai", "/v1/chat/completions", false},
-		{"https://opencode.ai/zen/go/v1", "/v1/messages", false},
+		{"https://opencode.ai/inference/go/v1", "/v1/messages", false},
 		{"https://opencode.ai/", "/v1/responses", false},
 		{"https://OPENCODE.ai", "/v1/chat/completions", false}, // host compare is case-insensitive
 		{"https://opencode.ai", "v1@evil.com", true},
@@ -837,7 +837,7 @@ func TestEndpointEscapeExcludedFromRoutableSet(t *testing.T) {
 
 	t.Run("path-hosted base keeps same-host @ endpoint routable", func(t *testing.T) {
 		cfg := testCfg()
-		cfg.BaseURL = "https://opencode.ai/zen/go/v1"
+		cfg.BaseURL = "https://opencode.ai/inference/go/v1"
 		cfg.RouteOverrides = map[string]config.RouteOverride{
 			"glm-5.2": {Protocol: "chat-completions", Endpoint: "/v1@evil.com/x"},
 		}

@@ -1,3 +1,11 @@
+## SPEC #2: catalog diagnostics and endpoint compatibility
+
+- Port the catalog diagnostic-message fix from xspeed1989/opencode-go-cliproxyapi commit 8e38b5d5d28e8a7d7eb535c8c1c42d2405c8e81b. Excluded model IDs/reasons are now visible with CPA's logging field allowlist; IDs stay quoted to prevent log injection.
+- Port the inference endpoint default from tympom/opencode-go-cliproxyapi commit feb456e5b3b85b2a23c7f5aba6bcd6c67dfc05d6 without adopting unrelated SDK/registry changes. Explicit custom base URLs remain supported.
+- Existing installations must change an explicitly configured legacy base URL themselves; a changed default does not override configuration.
+- Known host limitation (CPA v8.0.15): successful background plugin catalog refresh does not republish per-auth model registrations after an initially failed discovery. A controlled restart or configuration resync can restore registration. This patch does not claim to fix the host synchronization mechanism.
+- Windows deployment tooling verifies backups and post-start model availability, and restores the prior plugin/configuration on failure. See SPEC issue #2 for execution evidence.
+
 ## What's Changed
 
 - Support CLIProxyAPI v8 and its generic plugin quota API.

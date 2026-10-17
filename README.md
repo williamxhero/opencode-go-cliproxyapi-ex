@@ -71,11 +71,11 @@ Configure the plugin in your CLIProxyAPI `config.yaml` under `plugins.configs.op
 plugins:
   configs:
     opencode-go-cliproxyapi:
-      # Upstream base URL (default: "https://opencode.ai/zen/go/v1")
-      base-url: "https://opencode.ai/zen/go/v1"
+      # Upstream base URL (default: "https://opencode.ai/inference/go/v1")
+      base-url: "https://opencode.ai/inference/go/v1"
 
       # Optional catalog endpoint override (default: "{base-url}/models")
-      # catalog-url: "https://opencode.ai/zen/go/v1/models"
+      # catalog-url: "https://opencode.ai/inference/go/v1/models"
 
       # Client-facing model ID prefix configuration
       model-prefix:
@@ -117,7 +117,7 @@ plugins:
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `api-keys` | `[]object` | *(Required)* | List of API keys (`- value: "..."`, optional `name: "Personal"`). Supports `${ENV_VAR}` expansion. Duplicates and empty values are rejected. |
-| `base-url` | `string` | `https://opencode.ai/zen/go/v1` | Upstream base URL. Must be valid HTTPS (or HTTP if `allow-http: true`) without query parameters, fragments, or userinfo. |
+| `base-url` | `string` | `https://opencode.ai/inference/go/v1` | Upstream base URL. Must be valid HTTPS (or HTTP if `allow-http: true`) without query parameters, fragments, or userinfo. |
 | `catalog-url` | `string` | `{base-url}/models` | Full URL for catalog discovery. Defaults to `{base-url}/models`. |
 | `model-prefix.enabled` | `bool` | `true` | When `true`, client-facing model names use `<prefix>/<model>`. When `false`, uses bare model IDs. |
 | `model-prefix.value` | `string` | `opencode-go` | Provider prefix string when prefixing is enabled. |
@@ -172,7 +172,7 @@ With the plugin enabled, submit a management-authenticated request to
 `POST /v0/management/plugins/opencode-go-cliproxyapi/credentials`:
 
 ```json
-{"base_url":"https://opencode.ai/zen/go/v1","api_key":"oc_sk_dummy_example","name":"Personal"}
+{"base_url":"https://opencode.ai/inference/go/v1","api_key":"oc_sk_dummy_example","name":"Personal"}
 ```
 
 The response is `{"ok":true,"id":"opencode-go-key-<hash>","label":"Personal"}`.
