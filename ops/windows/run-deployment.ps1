@@ -17,4 +17,4 @@ $p=Start-Process -FilePath $python -ArgumentList @($script,$manifest) -WorkingDi
 $p.WaitForExit()
 $p.Refresh()
 @{pid=$p.Id; exitCode=$p.ExitCode; finish=[DateTime]::UtcNow.ToString('o')} | ConvertTo-Json | Set-Content -LiteralPath $finished -Encoding UTF8
-if ($p.ExitCode -notin @(0,2,3)) { throw 'Guarded deployment or recovery failed. Inspect fixed stage codes and receipts.' }
+if ($p.ExitCode -notin @(0,2)) { throw 'Guarded deployment or recovery failed. Inspect fixed stage codes and receipts.' }

@@ -14,6 +14,7 @@ import subprocess
 import sys
 import time
 import tomllib
+from typing import Any
 
 
 def digest(p):
@@ -114,7 +115,10 @@ def stop(m):
                 service_state(name, 'Stopped')
             except Exception:
                 event(m, 'stop_service', 'failed')
-        if any(x['status'] == 'Running' for x in snapshot(m)):
+        states = snapshot(m)
+        expected_names = set(m['running_services'])
+        actual_names = {x['name'] for x in states}
+        if actual_names != expected_names or any(x['status'] != 'Stopped' for x in states):
             raise RuntimeError('services_not_stopped')
     else:
         import psutil
@@ -176,11 +180,17 @@ def request(m, path, key):
     c = http.client.HTTPConnection('127.0.0.1', m['port'], timeout=4)
     import threading
     import socket
-    deadline = time.monotonic() + 6
+    state: dict[str, Any] = {'response': None, 'sock': None}
     def abort():
         try:
-            if c.sock:
-                c.sock.shutdown(socket.SHUT_RDWR)
+            sock = state['sock']
+            if sock is not None:
+                sock.shutdown(socket.SHUT_RDWR)
+                sock.close()
+            elif state['response'] is not None:
+                state['response'].close()
+            else:
+                c.close()
         except OSError:
             pass
     timer = threading.Timer(5, abort)
@@ -188,7 +198,11 @@ def request(m, path, key):
     timer.start()
     try:
         c.request('GET', path, headers={'Authorization': 'Bearer ' + key})
+        state['sock'] = c.sock
         r = c.getresponse()
+        state['response'] = r
+        if state['sock'] is None and r.fp is not None:
+            state['sock'] = r.fp.raw._sock
         body = r.read(2 * 1024 * 1024)
         if r.status != 200:
             raise RuntimeError('health_http')
@@ -217,7 +231,7 @@ def healthy(m, require_plugin, seconds=55):
                 d = request(m, '/v0/management/auth-files/models?name=' +
                             urllib.parse.quote(m['auth_name']), management)
                 models = {x['id'] for x in d['models']}
-                if (needed.issubset(models) if require_plugin else models == needed) is False:
+                if not needed.issubset(models):
                     raise RuntimeError('plugin_models_mismatch')
             return True
         except Exception:
