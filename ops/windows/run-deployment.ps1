@@ -15,6 +15,10 @@ if (Test-Path -LiteralPath $finished) { throw 'Transaction was already run; use 
 $p=Start-Process -FilePath $python -ArgumentList @($script,$manifest) -WorkingDirectory $root -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
 @{pid=$p.Id; start=[DateTime]::UtcNow.ToString('o'); elevated=$true} | ConvertTo-Json | Set-Content -LiteralPath $launcher -Encoding UTF8
 $p.WaitForExit()
-$p.Refresh()
-@{pid=$p.Id; exitCode=$p.ExitCode; finish=[DateTime]::UtcNow.ToString('o')} | ConvertTo-Json | Set-Content -LiteralPath $finished -Encoding UTF8
-if ($p.ExitCode -notin @(0,2)) { throw 'Guarded deployment or recovery failed. Inspect fixed stage codes and receipts.' }
+$exitCode=$p.ExitCode
+@{pid=$p.Id; exitCode=$exitCode; finish=[DateTime]::UtcNow.ToString('o')} | ConvertTo-Json | Set-Content -LiteralPath $finished -Encoding UTF8
+$resultPath=Join-Path $root 'result.json'
+if (-not (Test-Path -LiteralPath $resultPath)) { throw 'Missing deployment result receipt.' }
+$result=Get-Content -LiteralPath $resultPath -Raw | ConvertFrom-Json
+if ($result.outcome -notin @('upgraded','rolled_back') -or -not $result.core_healthy) { throw 'Guarded deployment or recovery failed.' }
+if ($null -ne $exitCode -and $exitCode -notin @(0,2)) { throw 'Guarded deployment returned a failure status.' }
