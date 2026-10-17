@@ -203,7 +203,7 @@ func TestCredentialConfiguredDuplicateAndConcurrentCreate(t *testing.T) {
 	bridge, f := credentialTestHost(t)
 	m := NewManager(bridge)
 	m.cfg = config.Config{BaseURL: config.DefaultBaseURL, APIKeys: []config.APIKey{{Value: "configured-dummy"}}}
-	if resp := postCredential(t, m, `{"base_url":"https://opencode.ai/zen/go/v1","api_key":"configured-dummy"}`); resp.StatusCode != 409 {
+	if resp := postCredential(t, m, `{"base_url":"https://opencode.ai/inference/go/v1","api_key":"configured-dummy"}`); resp.StatusCode != 409 {
 		t.Fatalf("configured duplicate=%d", resp.StatusCode)
 	}
 	var wg sync.WaitGroup
