@@ -35,7 +35,7 @@ This plugin exposes OpenCode Go as a single provider (`opencode-go`) backed by a
 - **Thinking & Reasoning Support**: Maps reasoning effort across supported client and upstream formats.
 - **Dynamic Catalog Discovery**: Fetches remote model catalogs with local fallback and custom route overrides.
 - **Multi-Key Auth Scheduling**: Pools multiple API keys with CLIProxyAPI's native scheduler for rotation, retries, and error cooldowns across all protocols.
-- **Native quotas**: Rolling, weekly, and monthly quotas use CLIProxyAPI’s generic quota endpoints and the selected credential. A compatibility resource page is also exposed for older Management Center builds.
+- **Native quotas**: Rolling, weekly, and monthly quotas use CLIProxyAPI's generic quota endpoints and the selected credential. A compatibility resource page is also exposed for older Management Center builds.
 
 ## Requirements
 
@@ -44,21 +44,22 @@ This plugin exposes OpenCode Go as a single provider (`opencode-go`) backed by a
 
 ## Build
 
-Build the dynamic shared library for your platform:
+Build the shared library with the `debug` tag for local development.
+CI handles release builds.
 
 ### Windows (AMD64)
 ```powershell
-go build -buildmode=c-shared -o plugins/windows/amd64/opencode-go-cliproxyapi.dll .
+go build -tags debug -buildmode=c-shared -o plugins/windows/amd64/opencode-go-cliproxyapi.dll .
 ```
 
 ### Linux (AMD64)
 ```bash
-go build -buildmode=c-shared -o plugins/linux/amd64/opencode-go-cliproxyapi.so .
+go build -tags debug -buildmode=c-shared -o plugins/linux/amd64/opencode-go-cliproxyapi.so .
 ```
 
 ### macOS (ARM64)
 ```bash
-go build -buildmode=c-shared -o plugins/darwin/arm64/opencode-go-cliproxyapi.dylib .
+go build -tags debug -buildmode=c-shared -o plugins/darwin/arm64/opencode-go-cliproxyapi.dylib .
 ```
 
 Place the compiled binary into your CLIProxyAPI plugin directory (e.g. `<cliproxyapi_root>/plugins/<os>/<arch>/`).
@@ -157,10 +158,10 @@ plugin does not guess a route for an unknown model.
 
 ```powershell
 # Run all tests
-go test ./...
+go test -tags debug ./...
 
 # Run tests with coverage
-go test ./... -cover
+go test -tags debug ./... -cover
 
 # Run linter / vetting
 go vet ./...
@@ -200,9 +201,10 @@ returning a timeout while a mutating callback continues.
 ## Account names and quotas
 
 Set an optional `name` on each `api-keys` entry, alongside `value`.
-For example, use `name: Personal` or `name: Work`. Without a name, one key
-uses **OpenCode Go**; multiple keys use **OpenCode Go 1**, **OpenCode Go 2**, and subsequent numbers.
-Default numbers follow configuration order. Explicit names remain stable when keys are reordered.
+For example, use `name: Personal` or `name: Work`. Without a name, the
+credential label shows the masked API key; generated credential filenames use
+**OpenCode-Go.json**, with numeric suffixes when needed. Explicit names remain
+stable when keys are reordered.
 The usage response contains no email or account identity. The plugin does not infer an email from a key.
 
 Configured credential files have readable names. Existing auth IDs remain unchanged, and

@@ -11,7 +11,7 @@
 - Support CLIProxyAPI v8 and its generic plugin quota API.
 - Return rolling, weekly, and monthly quotas for the credential selected by CLIProxyAPI.
 - Advertise the quota provider as **OpenCode Go**.
-- Remove the separate OpenCode Go quota page and custom management routes.
+- Keep the fork's compatibility quota page and credential management route alongside native quota endpoints.
 - Accept an optional `name` for each API key.
 - Use readable account labels and filenames instead of key digests.
 - Preserve existing auth IDs, custom labels, filenames, and host metadata.
@@ -32,3 +32,20 @@ add those controls to older dashboard builds.
 
 Existing credential files keep their names and stable IDs. Set `name:` on an
 API key to choose its display label. New files use readable names.
+
+### Bug Fixes
+
+- Preserve Claude image tool results when routing to Chat Completions: retain images in an associated user message after tool replies, preserve text, tool references and error markers, and include images in session derivation. The selected upstream model must support image input.
+
+Special thanks to @c0mm4nd in #16.
+
+- Fix `tool_result` translation when receiving `tool_reference` content blocks from Claude clients (such as ToolSearch, web search, or web fetch in Claude Code), preventing 500 errors and conversation lockouts on Chat Completions and Responses models like DeepSeek.
+
+Special thanks to @SpiGAndromeda in #14.
+
+## Upgrade Notes
+
+- Replace the old plugin binary with the new release binary.
+- Restart CLIProxyAPI after replacing the plugin.
+
+**Upstream Changelog**: https://github.com/massiveits/opencode-go-cliproxyapi/compare/v0.2.1...v0.2.2
